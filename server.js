@@ -1,40 +1,23 @@
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
-const connectDB = require("./config/connectDB");
-connectDB();
-const morgan = require("morgan");
-const cors = require("cors");
-const userRoute = require("./routes/userRoutes");
-const blogRoute = require("./routes/blogRoutes");
-const cookie = require("cookie-parser");
 const path = require("path");
 
 const app = express();
 
-app.use(morgan("dev"));
-app.use(
-  cors({
-    credentials: true,
-    origin: "http://localhost:5173",
-  })
-);
-
-app.use(express.json());
-app.use(cookie());
-
 const PORT = process.env.PORT || 7000;
 
-// Serve static files from the frontend's dist folder
+// Serve static files from the 'frontend/dist' directory
 app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
 
-// Define API routes
-app.use("/api/v1/user", userRoute);
-app.use("/api/v1/blog", blogRoute);
-
-// Serve index.html for the root route
+// Root route to serve index.html
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  try {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  } catch (error) {
+    console.error("Error sending index.html:", error);
+    res.status(500).send("Server error occurred while loading the page.");
+  }
 });
 
 app.listen(PORT, () => {
