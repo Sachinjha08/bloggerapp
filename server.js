@@ -23,16 +23,19 @@ app.use(
 
 app.use(express.json());
 app.use(cookie());
-
-// Serve static files
 app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
 
-// Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/blog", blogRoute);
 
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 // Export the app for Vercel
