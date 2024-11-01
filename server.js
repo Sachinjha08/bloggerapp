@@ -25,15 +25,16 @@ app.use(cookie());
 
 const PORT = process.env.PORT || 7000;
 
-// Serve static files from the frontend's dist folder
-app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
-
-// API routes
+// app.use("/", (req, res) => {
+//   res.status(201).send({
+//     message: `App is running on ${PORT}`,
+//   });
+// });
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/blog", blogRoute);
 
-// Serve the index.html file for the root route
-app.get("*", (req, res) => {
+app.get("/", (req, res) => {
+  app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 });
 
