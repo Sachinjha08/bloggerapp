@@ -1,15 +1,14 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
 const connectDB = require("./config/connectDB");
+connectDB();
 const morgan = require("morgan");
 const cors = require("cors");
 const userRoute = require("./routes/userRoutes");
 const blogRoute = require("./routes/blogRoutes");
 const cookie = require("cookie-parser");
 const path = require("path");
-
-dotenv.config();
-connectDB();
 
 const app = express();
 
@@ -23,20 +22,21 @@ app.use(
 
 app.use(express.json());
 app.use(cookie());
+
+const PORT = process.env.PORT || 7000;
+
+// Serve static files from the frontend's dist folder
 app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
 
+// Define API routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/blog", blogRoute);
 
+// Serve index.html for the root route
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
+app.listen(PORT, () => {
+  console.log(`App is running on http://localhost:${PORT}`);
 });
-
-// Export the app for Vercel
-module.exports = app;
